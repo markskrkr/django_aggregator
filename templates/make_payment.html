@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Make Payment</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #payment-form {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        #payment-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #payment-form input[type="text"],
+        #payment-form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        #payment-form input[type="radio"] {
+            margin: 0 5px 20px 0;
+        }
+        #payment-form input[type="submit"] {
+            background-color: #5a6a79;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #payment-form input[type="submit"]:hover {
+            background-color: #5a6a79;
+        }
+        #home-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #home-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<button id="home-button" onclick="location.href='{% url 'home' %}'">Home</button>
+    <h1>Make Payment</h1>
+
+    <form id="payment-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <label for="booking-id">Booking ID:</label>
+        <input type="text" id="booking-id" name="booking-id">
+
+        <label for="payment-company">Payment Company:</label>
+        <input type="radio" id="company1" name="payment-company" value="company1">
+        <label for="company1">Company 1</label>
+        <input type="radio" id="company2" name="payment-company" value="company2">
+        <label for="company2">Company 2</label>
+        <input type="radio" id="company3" name="payment-company" value="company3">
+        <label for="company3">Company 3</label>
+        <input type="radio" id="company4" name="payment-company" value="company4">
+        <label for="company4">Company 4</label>
+
+        <label for="flight-company">Flight Company:</label>
+        <input type="radio" id="flight1" name="flight-company" value="flight1">
+        <label for="flight1">Airline 1</label>
+        <input type="radio" id="flight2" name="flight-company" value="flight2">
+        <label for="flight2">Airline 2</label>
+        <input type="radio" id="flight3" name="flight-company" value="flight3">
+        <label for="flight3">Airline 3</label>
+        <input type="radio" id="flight4" name="flight-company" value="flight4">
+        <label for="flight4">Airline 4</label><br>
+
+        <input type="submit" value="Make Payment">
+    </form>
+
+      <script>
+    $(document).ready(function() {
+        $("#payment-form").submit(function(event) {
+            event.preventDefault();
+
+            var bookingId = $("#booking-id").val();
+            var paymentCompany = $("input[name='payment-company']:checked").val();
+            var flightCompany = $("input[name='flight-company']:checked").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
+
+            $.ajax({
+                url: 'http://localhost:8000/make_payment/',
+                type: 'POST',
+                data: {
+                    booking_id: bookingId,
+                    payment_company: paymentCompany,
+                    flight_company: flightCompany,
+                    username: username,
+                    password: password
+                },
+                success: function(data) {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Error: ' + textStatus + ' ' + errorThrown);
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

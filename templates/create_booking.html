@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Booking</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        #title {
+            background-color: #007BFF;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        form {
+            margin-bottom: 1em;
+        }
+
+        label {
+            display: block;
+            margin-top: 1em;
+        }
+
+        input[type=text], select {
+            width: 100%;
+            padding: .5em;
+            margin-top: .5em;
+        }
+
+        button, input[type=submit] {
+            margin-top: 1em;
+            padding: .5em 1em;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: .25em;
+            cursor: pointer;
+        }
+
+        button:hover, input[type=submit]:hover {
+            background-color: #0056b3;
+        }
+
+        #booking-result {
+            margin-top: 1em;
+            padding: 1em;
+            border-radius: .25em;
+        }
+
+        #home-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #home-button:hover {
+            background-color: #0056b3;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <button id="home-button" onclick="location.href='{% url 'home' %}'">Home</button>
+    <div id="title">
+        <h1>Create Booking</h1>
+    </div>
+    <div style="width: 60%; margin: auto;">
+        <h1>Create Booking</h1>
+        <form id="booking-form">
+            <label for="flight_number">Flight Number:</label>
+            <input type="text" id="flight_number" name="flight_number">
+            <label for="airline_choice">Airline:</label>
+            <select id="airline_choice" name="airline_choice">
+                <option value="airline1">Airline 1</option>
+                <option value="airline2">Airline 2</option>
+                <option value="airline3">Airline 3</option>
+                <option value="airline4">Airline 4</option>
+            </select>
+
+        <h2>Passengers:</h2>
+        <div id="passengers">
+            <div class="passenger">
+                <label for="passenger_name">Name:</label><br>
+                <input type="text" class="passenger_name" name="passenger_name"><br>
+                <label for="passenger_id">ID:</label><br>
+                <input type="text" class="passenger_id" name="passenger_id"><br>
+                <label for="seat_type">Seat Type:</label><br>
+                <input type="text" class="seat_type" name="seat_type"><br>
+                <label for="passenger_phone">Phone:</label><br>
+                <input type="text" class="passenger_phone" name="passenger_phone"><br>
+            </div>
+        </div>
+        <button type="button" id="add-passenger">Add Passenger</button>
+        <br>
+        <input type="submit" value="Create Booking">
+
+        </form>
+
+        <h2>Booking Result:</h2>
+        <div id="booking-result">
+
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $("#add-passenger").click(function() {
+                $("#passengers").append($(".passenger:first").clone());
+            });
+
+            $("#booking-form").submit(function(event) {
+                event.preventDefault();
+
+                var flight_number = $("#flight_number").val();
+                var airline_choice = $("#airline_choice").val();
+                var passengers = [];
+                $(".passenger").each(function() {
+                    var passenger_name = $(this).find(".passenger_name").val();
+                    var passenger_id = $(this).find(".passenger_id").val();
+                    var seat_type = $(this).find(".seat_type").val();
+                    var passenger_phone = $(this).find(".passenger_phone").val();
+                    passengers.push({
+                        passenger_name: passenger_name,
+                        passenger_id: passenger_id,
+                        seat_type: seat_type,
+                        passenger_phone: passenger_phone,
+                    });
+                });
+                $.ajax({
+                    url: 'http://localhost:8000/create_bookingapi/',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        flight_number: flight_number,
+                        airline_choice: airline_choice,
+                        passengers: passengers,
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(data) {
+                        var booking_id = data.booking_id;
+                        $("#booking-result").html("Booking created successfully. Booking ID: " + booking_id);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $("#booking-result").html("Error creating booking: " + textStatus + ' ' + errorThrown);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
